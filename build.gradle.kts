@@ -23,6 +23,9 @@ dependencies {
     compile("jp.nephy", "jsonkt", "1.5")
 
     compile("io.github.microutils", "kotlin-logging", "1.5.4")
+
+    testCompile("ch.qos.logback", "logback-core", "1.2.3")
+    testCompile("ch.qos.logback", "logback-classic", "1.2.3")
 }
 
 tasks.withType<KotlinCompile> {
