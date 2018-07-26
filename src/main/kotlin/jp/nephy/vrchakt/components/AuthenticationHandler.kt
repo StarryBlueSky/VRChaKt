@@ -23,7 +23,7 @@ class AuthenticationHandler(private val authenticationData: AuthenticationData) 
         override val key: AttributeKey<AuthenticationHandler> = AttributeKey("AuthenticationHandler")
         private val headerName = HttpHeaders.Authorization
 
-        const val requiredAuthorizationFlag = "REQUIRED_AUTHORIZATION"
+        const val authenticationRequiredFlag = "AUTHENTICATION_REQUIRED"
 
         override suspend fun prepare(block: Configuration.() -> Unit): AuthenticationHandler {
             return Configuration().apply(block).build()
@@ -31,16 +31,16 @@ class AuthenticationHandler(private val authenticationData: AuthenticationData) 
 
         override fun install(feature: AuthenticationHandler, scope: HttpClient) {
             scope.requestPipeline.intercept(HttpRequestPipeline.State) {
-                if (context.headers.names().contains(requiredAuthorizationFlag)) {
+                if (context.headers.names().contains(authenticationRequiredFlag)) {
                     if (! context.headers.names().contains(headerName)) {
-                        if (feature.authenticationData.cookie == null) {
-                            throw VRChaKtException { "Auth cookie is not set." }
+                        if (feature.authenticationData.token == null) {
+                            throw VRChaKtException { "Auth token (Cookie) is not set." }
                         }
 
-                        context.headers.append(headerName, "Bearer ${feature.authenticationData.cookie}")
+                        context.headers.append(headerName, "Bearer ${feature.authenticationData.token}")
                     }
 
-                    context.headers.remove(requiredAuthorizationFlag)
+                    context.headers.remove(authenticationRequiredFlag)
                 }
             }
         }
