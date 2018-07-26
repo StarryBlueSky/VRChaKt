@@ -26,8 +26,12 @@ class VRChaKtRequest<M: VRChaKtModel>(private val httpClient: HttpClient, privat
             response.readText()
         }.let {
             if (isJsonArray) {
-                JsonKt.toJsonArray(it).let {
-                    jsonObject("items" to it)
+                try {
+                    JsonKt.toJsonArray(it).let {
+                        jsonObject("items" to it)
+                    }
+                } catch (e: Exception) {
+                    JsonKt.toJsonObject(it)
                 }
             } else {
                 JsonKt.toJsonObject(it)
@@ -36,7 +40,7 @@ class VRChaKtRequest<M: VRChaKtModel>(private val httpClient: HttpClient, privat
 
         if (json.contains("error")) {
             val error = try {
-                JsonKt.parse<Error>(json)
+                JsonKt.parse<Error>(json["error"].jsonObject)
             } catch (e: Exception) {
                 null
             }
