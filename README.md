@@ -10,7 +10,7 @@ VRChat API wrapper for Kotlin. (WIP)
 # TODO
 - Automate Cookie fetching.
 - Implement User-login.
-- Support more endpoints. (Currently supports world#getById only.)
+- Support more endpoints.
 - Documentize / Update README.
 - Support i18n(internationalization). Localize exception message & README.
 - Sync with Maven Central.
@@ -28,9 +28,10 @@ fun main(args: Array<String>) {
             cookie("YOUR_AUTHCOOKIE_HERE")
         }
     }.with {
-        val world = world.getById("wrld_xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx").complete()
+        // Get The Hub world.
+        val world = world.getById("wrld_b51f016d-1073-4c75-930d-9f44222c7fc3").complete()
 
-        println(world.result.name) // Print world name.
+        println(world.result.description) // Print world description.
     }
 }
 ```
