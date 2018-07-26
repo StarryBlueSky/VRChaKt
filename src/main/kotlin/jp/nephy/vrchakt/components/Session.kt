@@ -11,6 +11,7 @@ import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 data class Session(val httpClient: HttpClient, val userAgent: String, val endpointVersion: EndpointVersion, val authenticationData: AuthenticationData): Closeable {
+    val logger = logger(javaClass)
     val executor = Executors.newCachedThreadPool {
         Executors.defaultThreadFactory().newThread(it).also {
             it.isDaemon = true
@@ -20,6 +21,7 @@ data class Session(val httpClient: HttpClient, val userAgent: String, val endpoi
     inline fun <reified M: VRChaKtModel> newCall(path: String, isJsonArray: Boolean = false, vararg params: Pair<String, Any?>, noinline builder: HttpRequestBuilder.() -> Unit = {  }): VRChaKtRequest<M> {
         var request: HttpRequestBuilder.() -> Unit = {
             builder()
+
             url {
                 protocol = endpointVersion.protocol
                 host = endpointVersion.host
@@ -35,6 +37,8 @@ data class Session(val httpClient: HttpClient, val userAgent: String, val endpoi
                     parameters.append(query.first, value)
                 }
             }
+            logger.debug { "URL = ${url.buildString()}" }
+
             userAgent(userAgent)
         }
 
