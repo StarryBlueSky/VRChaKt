@@ -1,4 +1,8 @@
-package jp.nephy.vrchakt.models
+package jp.nephy.vrchakt.models.parameters
+
+/*
+    https://vrchatapi.github.io/#/UserAPI/Tags
+ */
 
 enum class UserTag {
     SystemScriptingAccess, AdminScriptingAccess,
