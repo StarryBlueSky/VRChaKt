@@ -4,11 +4,11 @@ import io.ktor.client.HttpClient
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.http.userAgent
-import jp.nephy.vrchakt.components.annotations.BasicAuthentication
 import jp.nephy.vrchakt.models.RemoteConfig
 import jp.nephy.vrchakt.models.VRChaKtModel
 import java.io.Closeable
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 data class Session(val httpClient: HttpClient, val userAgent: String, val endpointVersion: EndpointVersion, val authenticationData: AuthenticationData): Closeable {
     val executor = Executors.newCachedThreadPool {
@@ -17,7 +17,7 @@ data class Session(val httpClient: HttpClient, val userAgent: String, val endpoi
         }
     }!!
 
-    inline fun <reified M: VRChaKtModel> newCall(path: String, vararg params: Pair<String, Any?>, noinline builder: HttpRequestBuilder.() -> Unit = {  }): VRChaKtRequest<M> {
+    inline fun <reified M: VRChaKtModel> newCall(path: String, isJsonArray: Boolean = false, vararg params: Pair<String, Any?>, noinline builder: HttpRequestBuilder.() -> Unit = {  }): VRChaKtRequest<M> {
         var request: HttpRequestBuilder.() -> Unit = {
             builder()
             url {
@@ -42,25 +42,28 @@ data class Session(val httpClient: HttpClient, val userAgent: String, val endpoi
         if (trace != null) {
             val method = javaClass.classLoader.loadClass(trace.className).methods.find { it.name == trace.methodName }
             if (method != null) {
-                if (method.isAnnotationPresent(BasicAuthentication::class.java)) {
+                if (method.isAnnotationPresent(AuthenticationRequred::class.java)) {
                     val previousRequestBuilder = request
                     request = {
                         previousRequestBuilder()
-                        header(AuthenticationHandler.requiredAuthorizationFlag, "true")
+                        header(AuthenticationHandler.authenticationRequiredFlag, "true")
                     }
                 }
             }
         }
 
-        return VRChaKtRequest(httpClient, request, executor, M::class.java)
+        return VRChaKtRequest(httpClient, request, executor, M::class.java, isJsonArray)
     }
 
     val remoteConfig = newCall<RemoteConfig>("/config").complete().result.also {
-        authenticationData.apiKey = it.apiKey
+        if (authenticationData.apiKey == null) {
+            authenticationData.apiKey = it.apiKey
+        }
     }
 
     override fun close() {
         httpClient.close()
         executor.shutdownNow()
+        executor.awaitTermination(10, TimeUnit.SECONDS)
     }
 }

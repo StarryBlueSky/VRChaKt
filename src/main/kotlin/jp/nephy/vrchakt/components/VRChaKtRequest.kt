@@ -8,13 +8,14 @@ import io.ktor.client.response.HttpResponse
 import io.ktor.client.response.readText
 import jp.nephy.jsonkt.JsonKt
 import jp.nephy.jsonkt.contains
+import jp.nephy.jsonkt.jsonObject
 import jp.nephy.vrchakt.exceptions.VRChatApiError
 import jp.nephy.vrchakt.models.Error
 import jp.nephy.vrchakt.models.VRChaKtModel
 import kotlinx.coroutines.experimental.runBlocking
 import java.util.concurrent.ExecutorService
 
-class VRChaKtRequest<M: VRChaKtModel>(private val httpClient: HttpClient, private val httpRequest: HttpRequestBuilder.() -> Unit, executor: ExecutorService, private val modelClass: Class<M>): ApiAction<M>(executor) {
+class VRChaKtRequest<M: VRChaKtModel>(private val httpClient: HttpClient, private val httpRequest: HttpRequestBuilder.() -> Unit, executor: ExecutorService, private val modelClass: Class<M>, private val isJsonArray: Boolean): ApiAction<M>(executor) {
     override fun complete(): VRChaKtResponse<M> {
         val response = runBlocking {
             httpClient.request<HttpResponse>(httpRequest)
@@ -24,7 +25,13 @@ class VRChaKtRequest<M: VRChaKtModel>(private val httpClient: HttpClient, privat
         val json = runBlocking {
             response.readText()
         }.let {
-            JsonKt.toJsonObject(it)
+            if (isJsonArray) {
+                JsonKt.toJsonArray(it).let {
+                    jsonObject("items" to it)
+                }
+            } else {
+                JsonKt.toJsonObject(it)
+            }
         }
 
         if (json.contains("error")) {
