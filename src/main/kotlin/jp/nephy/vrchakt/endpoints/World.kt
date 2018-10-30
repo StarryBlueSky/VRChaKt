@@ -1,19 +1,15 @@
 package jp.nephy.vrchakt.endpoints
 
-import io.ktor.http.HttpMethod
 import jp.nephy.vrchakt.VRChaKtClient
-import jp.nephy.vrchakt.components.AuthenticationRequred
-import jp.nephy.vrchakt.components.VRChaKtRequest
-import jp.nephy.vrchakt.models.*
+import jp.nephy.vrchakt.core.VRChaKtJsonArrayAction
+import jp.nephy.vrchakt.models.Success
 import jp.nephy.vrchakt.models.World
-import jp.nephy.vrchakt.models.parameters.*
 
+@Suppress("UNUSED")
 class World(override val client: VRChaKtClient): VRChaKtEndpoint {
-    @AuthenticationRequred
-    fun getById(id: String) = client.session.newCall<World>("/worlds/$id")
+    fun show(id: String) = client.session.get("/worlds/$id").jsonObject<World.Detail>()
 
-    @AuthenticationRequred
-    fun list(filter: ListWorldFilter = ListWorldFilter.Any, featured: Boolean? = null, sort: SortOptions? = null, user: UserOptions? = null, userId: String? = null, n: Int? = null, offset: Int? = null, search: String? = null, tag: Array<WorldTag>? = null, notag: Array<WorldTag>? = null, releaseStatus: ReleaseStatus? = null, maxUnityVersion: String? = null, minUnityVersion: String? = null, maxAssetVersion: String? = null, minAssetVersion: String? = null, platform: String? = null): VRChaKtRequest<WorldList> {
+    fun list(filter: ListWorldFilter = ListWorldFilter.Any, featured: Boolean? = null, sort: World.Sort? = null, user: World.User? = null, userId: String? = null, n: Int? = null, offset: Int? = null, search: String? = null, tag: List<String>? = null, notag: List<String>? = null, releaseStatus: World.ReleaseStatus? = null, maxUnityVersion: String? = null, minUnityVersion: String? = null, maxAssetVersion: String? = null, minAssetVersion: String? = null, platform: String? = null): VRChaKtJsonArrayAction<World.Simple> {
         val path = when (filter) {
             ListWorldFilter.Any -> "/worlds"
             ListWorldFilter.Active -> "/worlds/active"
@@ -21,17 +17,34 @@ class World(override val client: VRChaKtClient): VRChaKtEndpoint {
             ListWorldFilter.Favorites -> "/worlds/favorites"
         }
 
-        return client.session.newCall(path, true, "featured" to featured, "sort" to sort?.key, "user" to user?.key, "userId" to userId, "n" to n, "offset" to offset, "search" to search, "tag" to tag?.joinToString(",") { it.key }, "notag" to notag?.joinToString(",") { it.key }, "releaseStatus" to releaseStatus?.key, "maxUnityVersion" to maxUnityVersion, "minUnityVersion" to minUnityVersion, "maxAssetVersion" to maxAssetVersion, "minAssetVersion" to minAssetVersion, "platform" to platform)
+        return client.session.get(path) {
+            parameter(
+                    "featured" to featured,
+                    "sort" to sort?.value,
+                    "user" to user?.value,
+                    "userId" to userId,
+                    "n" to n,
+                    "offset" to offset,
+                    "search" to search,
+                    "tag" to tag?.joinToString(","),
+                    "notag" to notag?.joinToString(","),
+                    "releaseStatus" to releaseStatus?.value,
+                    "maxUnityVersion" to maxUnityVersion,
+                    "minUnityVersion" to minUnityVersion,
+                    "maxAssetVersion" to maxAssetVersion,
+                    "minAssetVersion" to minAssetVersion,
+                    "platform" to platform
+            )
+        }.jsonArray()
     }
 
-    @AuthenticationRequred
-    fun delete(id: String) = client.session.newCall<Unknown>("/worlds/$id") {
-        method = HttpMethod.Delete
+    fun delete(id: String) = client.session.delete("/worlds/$id").jsonObject<Success.Result>()
+
+    fun metadata(id: String) = client.session.get("/worlds/$id/metadata").jsonObject<World.Metadata>()
+
+    fun instance(id: String, instanceId: String) = client.session.get("/worlds/$id/$instanceId").jsonObject<World.Instance>()
+
+    enum class ListWorldFilter {
+        Any, Active, Recent, Favorites
     }
-
-    @AuthenticationRequred
-    fun getMetadata(id: String) = client.session.newCall<WorldMetadata>("/worlds/$id/metadata")
-
-    @AuthenticationRequred
-    fun getInstance(id: String, instanceId: String) = client.session.newCall<WorldInstance>("/worlds/$id/$instanceId")
 }
