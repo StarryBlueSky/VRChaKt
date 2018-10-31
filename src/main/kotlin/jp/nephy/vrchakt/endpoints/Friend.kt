@@ -8,7 +8,7 @@ import jp.nephy.vrchakt.models.Success
 class Friend(override val client: VRChaKtClient): VRChaKtEndpoint {
     fun list(offset: Int? = null, n: Int? = null, offline: Boolean? = null) = client.session.get("/auth/user/friends") {
         parameter("offset" to offset, "n" to n, "offline" to offline)
-    }.jsonObject<Friend.User>()
+    }.jsonArray<Friend.User>()
 
     fun friendStatus(id: String) = client.session.get("/user/$id/friendStatus").jsonObject<Friend.Status>()
 
