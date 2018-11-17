@@ -9,7 +9,7 @@ import jp.nephy.vrchakt.models.World
 class World(override val client: VRChaKtClient): VRChaKtEndpoint {
     fun show(id: String) = client.session.get("/worlds/$id").jsonObject<World.Detail>()
 
-    fun list(filter: ListWorldFilter = ListWorldFilter.Any, featured: Boolean? = null, sort: World.Sort? = null, user: World.User? = null, userId: String? = null, n: Int? = null, offset: Int? = null, search: String? = null, tag: List<String>? = null, notag: List<String>? = null, releaseStatus: World.ReleaseStatus? = null, maxUnityVersion: String? = null, minUnityVersion: String? = null, maxAssetVersion: String? = null, minAssetVersion: String? = null, platform: String? = null): VRChaKtJsonArrayAction<World.Simple> {
+    fun list(filter: ListWorldFilter = ListWorldFilter.Any, featured: Boolean? = null, sort: World.Sort? = null, order: World.Order? = null, user: World.User? = null, userId: String? = null, n: Int? = null, offset: Int? = null, search: String? = null, tag: List<String>? = null, notag: List<String>? = null, releaseStatus: World.ReleaseStatus? = null, maxUnityVersion: String? = null, minUnityVersion: String? = null, maxAssetVersion: String? = null, minAssetVersion: String? = null, platform: String? = null): VRChaKtJsonArrayAction<World.Simple> {
         val path = when (filter) {
             ListWorldFilter.Any -> "/worlds"
             ListWorldFilter.Active -> "/worlds/active"
@@ -21,6 +21,7 @@ class World(override val client: VRChaKtClient): VRChaKtEndpoint {
             parameter(
                     "featured" to featured,
                     "sort" to sort?.value,
+                    "order" to order?.value,
                     "user" to user?.value,
                     "userId" to userId,
                     "n" to n,

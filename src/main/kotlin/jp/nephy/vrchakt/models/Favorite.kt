@@ -2,14 +2,14 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.ImmutableJsonObject
+import jp.nephy.jsonkt.JsonObject
 import jp.nephy.jsonkt.delegation.JsonEnum
 import jp.nephy.jsonkt.delegation.enum
 import jp.nephy.jsonkt.delegation.string
 import jp.nephy.jsonkt.delegation.stringList
 
 object Favorite {
-    data class Entry(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Entry(override val json: JsonObject): VRChaKtModel {
         val id by string
         val type by enum(Type::class, default = Type.World)
         val favoriteId by string

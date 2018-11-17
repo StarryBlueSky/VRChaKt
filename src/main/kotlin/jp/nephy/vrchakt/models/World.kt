@@ -2,11 +2,15 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.*
+import jp.nephy.jsonkt.JsonObject
 import jp.nephy.jsonkt.delegation.*
+import jp.nephy.jsonkt.parseList
+import jp.nephy.jsonkt.string
+import kotlinx.serialization.json.booleanOrNull
+import kotlinx.serialization.json.intOrNull
 
 object World {
-    data class Detail(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Detail(override val json: JsonObject): VRChaKtModel {
         val assetUrl by string
         val authorId by string
         val authorName by string
@@ -16,8 +20,8 @@ object World {
         val id by string
         val imageUrl by string
         val instances by lambdaList {
-            val array = it.immutableJsonArray
-            Instance(array[0].string, array[1].nullableInt ?: 0)
+            val array = it.jsonArray
+            Instance(array[0].string, array[1].intOrNull ?: 0)
         }
         val isLockdown by boolean
         val isSecure by boolean
@@ -38,7 +42,7 @@ object World {
 
         data class Instance(val id: String, val playerCount: Int)
 
-        data class UnityPackage(override val json: ImmutableJsonObject): VRChaKtModel {
+        data class UnityPackage(override val json: JsonObject): VRChaKtModel {
             val assetUrl by string
             val assetVersion by int
             val createdAt by string("created_at")
@@ -50,7 +54,7 @@ object World {
         }
     }
 
-    data class Simple(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Simple(override val json: JsonObject): VRChaKtModel {
         val authorName by string
         val capacity by int
         val id by string
@@ -63,34 +67,35 @@ object World {
         val thumbnailImageUrl by string
         val totalLikes by int
         val totalVisits by int
+        val tags by stringList
     }
 
-    data class Instance(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Instance(override val json: JsonObject): VRChaKtModel {
         val friends by lambda {
-            if (it.nullableBool == false) {
+            if (it.booleanOrNull == false) {
                 emptyList()
             } else {
-                it.immutableJsonArray.parseList<User>()
+                it.jsonArray.parseList<User>()
             }
         }
         val id by string
         val name by string
         val private by lambda {
-            if (it.nullableBool == false) {
+            if (it.booleanOrNull == false) {
                 emptyList()
             } else {
-                it.immutableJsonArray.parseList<User>()
+                it.jsonArray.parseList<User>()
             }
         }
         val users by lambda {
-            if (it.nullableBool == false) {
+            if (it.booleanOrNull == false) {
                 emptyList()
             } else {
-                it.immutableJsonArray.parseList<User>()
+                it.jsonArray.parseList<User>()
             }
         }
 
-        data class User(override val json: ImmutableJsonObject): JsonModel {
+        data class User(override val json: JsonObject): JsonModel {
             val currentAvatarImageUrl by string
             val currentAvatarThumbnailImageUrl by string
             val developerType by string
@@ -99,12 +104,12 @@ object World {
             val networkSessionId by string
             val status by string
             val statusDescription by string
-            val tags by immutableJsonArray  // TODO
+            val tags by stringList
             val username by string
         }
     }
 
-    data class Metadata(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Metadata(override val json: JsonObject): VRChaKtModel {
         val id by string
         val metadata by stringList
     }
@@ -132,5 +137,9 @@ object World {
         Order("order"),
         _createdAt("_created_at"),
         _updatedAt("_updated_at")
+    }
+
+    enum class Order(override val value: String): JsonEnum<String> {
+        Ascending("ascending"), Descending("descending")
     }
 }

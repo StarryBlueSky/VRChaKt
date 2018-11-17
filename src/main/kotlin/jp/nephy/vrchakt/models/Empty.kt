@@ -1,5 +1,5 @@
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.ImmutableJsonObject
+import jp.nephy.jsonkt.JsonObject
 
-data class Empty(override val json: ImmutableJsonObject): VRChaKtModel
+data class Empty(override val json: JsonObject): VRChaKtModel

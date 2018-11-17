@@ -2,17 +2,18 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.dsl.Coroutines
 
 plugins {
-    kotlin("jvm") version "1.3.0"
+    kotlin("jvm") version "1.3.10"
     maven
     signing
 }
 
 group = "jp.nephy"
-version = "2.0.0"
+version = "2.0.2"
 val ktorVersion = "1.0.0-beta-3"
 
 repositories {
     mavenCentral()
+    jcenter()
     maven("https://dl.bintray.com/kotlin/ktor")
     maven("https://dl.bintray.com/kotlin/kotlinx")
 }
@@ -25,9 +26,9 @@ dependencies {
     testCompile("io.ktor:ktor-client-cio:$ktorVersion")
     testCompile("io.ktor:ktor-client-jetty:$ktorVersion")
     testCompile("io.ktor:ktor-client-okhttp:$ktorVersion")
-    compile("jp.nephy:jsonkt:3.5")
+    compile("jp.nephy:jsonkt:4.0")
 
-    compile("io.github.microutils:kotlin-logging:1.6.10")
+    compile("io.github.microutils:kotlin-logging:1.6.20")
     testCompile("ch.qos.logback:logback-core:1.2.3")
     testCompile("ch.qos.logback:logback-classic:1.2.3")
     testCompile("org.fusesource.jansi:jansi:1.17.1")

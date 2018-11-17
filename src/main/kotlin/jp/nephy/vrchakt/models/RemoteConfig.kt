@@ -2,13 +2,13 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.ImmutableJsonObject
+import jp.nephy.jsonkt.JsonObject
 import jp.nephy.jsonkt.delegation.boolean
 import jp.nephy.jsonkt.delegation.int
 import jp.nephy.jsonkt.delegation.string
 import jp.nephy.jsonkt.delegation.stringList
 
-data class RemoteConfig(override val json: ImmutableJsonObject): VRChaKtModel {
+data class RemoteConfig(override val json: JsonObject): VRChaKtModel {
     val address by string  // "1062 Folsom St., Suite 200, San Francisco, CA, 94103"
     val apiKey by string  // "JlE5Jldo5Jibnk5O5hTx6XVqsJu4WJ26"
     val appName by string  // "VrChat"

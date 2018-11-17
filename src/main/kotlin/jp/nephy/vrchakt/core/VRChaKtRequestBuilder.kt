@@ -10,13 +10,14 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.util.appendAll
 import io.ktor.util.flattenEntries
 import io.ktor.util.flattenForEach
-import jp.nephy.jsonkt.ImmutableJsonObject
-import jp.nephy.jsonkt.mutableJsonObjectOf
-import jp.nephy.jsonkt.toJsonElement
+import jp.nephy.jsonkt.JsonObject
+import jp.nephy.jsonkt.asJsonElement
 import jp.nephy.jsonkt.toJsonString
 import kotlinx.coroutines.io.ByteWriteChannel
 import kotlinx.coroutines.io.writeFully
 import kotlinx.coroutines.io.writeStringUtf8
+import kotlinx.serialization.json.JsonBuilder
+import kotlinx.serialization.json.json
 import mu.KotlinLogging
 import java.util.*
 
@@ -195,7 +196,7 @@ class MultiPartContent(private val parts: List<Part>): OutgoingContent.WriteChan
     }
 }
 
-class JsonTextContent(private val json: ImmutableJsonObject): OutgoingContent.WriteChannelContent() {
+class JsonTextContent(private val json: JsonObject): OutgoingContent.WriteChannelContent() {
     override val contentType = ContentType.Application.Json.withCharset(Charsets.UTF_8)
 
     override suspend fun writeTo(channel: ByteWriteChannel) {
@@ -203,20 +204,26 @@ class JsonTextContent(private val json: ImmutableJsonObject): OutgoingContent.Wr
     }
 
     class Builder {
-        private val json = mutableJsonObjectOf()
+        private val updates = mutableListOf<JsonBuilder.() -> Unit>()
 
         fun add(key: String, value: Any?) {
-            json[key] = value.toJsonElement()
+            updates += {
+                key to value.asJsonElement()
+            }
         }
 
         fun add(vararg pairs: Pair<String, Any?>) {
-            for (pair in pairs) {
-                add(pair.first, pair.second)
+            for ((first, second) in pairs) {
+                add(first, second)
             }
         }
 
         internal fun build(): JsonTextContent {
-            return JsonTextContent(json)
+            return JsonTextContent(json {
+                for (update in updates) {
+                    update()
+                }
+            })
         }
     }
 }

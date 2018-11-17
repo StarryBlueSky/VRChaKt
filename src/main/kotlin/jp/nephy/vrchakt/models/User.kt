@@ -2,11 +2,11 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.ImmutableJsonObject
+import jp.nephy.jsonkt.JsonObject
 import jp.nephy.jsonkt.delegation.*
 
 object User {
-    data class CurrentUser(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class CurrentUser(override val json: JsonObject): VRChaKtModel {
         val acceptedTOSVersion by int
         val currentAvatar by string
         val currentAvatarAssetUrl by string
@@ -15,7 +15,7 @@ object User {
         val developerType by enum(DeveloperType::class, default = DeveloperType.None)
         val displayName by string
         val emailVerified by boolean
-        val friendGroupNames by immutableJsonArray
+        val friendGroupNames by jsonArray
         val friends by stringList
         val hasBirthday by boolean
         val hasEmail by boolean
@@ -35,7 +35,7 @@ object User {
         val username by string
     }
 
-    data class Detail(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Detail(override val json: JsonObject): VRChaKtModel {
         val currentAvatarImageUrl by string
         val currentAvatarThumbnailImageUrl by string
         val developerType by enum(DeveloperType::class, default = DeveloperType.None)
@@ -51,7 +51,7 @@ object User {
         val worldId by nullableString
     }
 
-    data class Simple(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Simple(override val json: JsonObject): VRChaKtModel {
         val id by string
         val username by string
         val displayName by string
@@ -99,11 +99,11 @@ object User {
         None("none"), Trusted("trusted"), Internal("internal"), Moderator("moderator")
     }
 
-    data class PastDisplayName(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class PastDisplayName(override val json: JsonObject): VRChaKtModel {
         val displayName by string
         val updatedAt by string("updated_at")
     }
 
     // TODO
-    data class SteamDetails(override val json: ImmutableJsonObject): VRChaKtModel
+    data class SteamDetails(override val json: JsonObject): VRChaKtModel
 }

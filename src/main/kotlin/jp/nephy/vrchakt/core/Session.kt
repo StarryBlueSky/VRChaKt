@@ -1,3 +1,5 @@
+@file:Suppress("UNUSED")
+
 package jp.nephy.vrchakt.core
 
 import io.ktor.client.HttpClient

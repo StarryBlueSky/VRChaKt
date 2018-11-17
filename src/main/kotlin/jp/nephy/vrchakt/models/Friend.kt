@@ -2,7 +2,7 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.ImmutableJsonObject
+import jp.nephy.jsonkt.JsonObject
 import jp.nephy.jsonkt.delegation.boolean
 import jp.nephy.jsonkt.delegation.enum
 import jp.nephy.jsonkt.delegation.enumList
@@ -12,7 +12,7 @@ import jp.nephy.vrchakt.models.User.OnlineStatus
 import jp.nephy.vrchakt.models.User.Tag
 
 object Friend {
-    data class User(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class User(override val json: JsonObject): VRChaKtModel {
         val currentAvatarImageUrl by string
         val currentAvatarThumbnailImageUrl by string
         val developerType by enum(DeveloperType::class, default = DeveloperType.None)
@@ -25,7 +25,7 @@ object Friend {
         val username by string
     }
 
-    data class Status(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Status(override val json: JsonObject): VRChaKtModel {
         val isFriend by boolean
         val outgoingRequest by boolean
         val incomingRequest by boolean

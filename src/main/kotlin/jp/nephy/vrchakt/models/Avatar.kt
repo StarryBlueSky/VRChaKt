@@ -2,11 +2,11 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.ImmutableJsonObject
+import jp.nephy.jsonkt.JsonObject
 import jp.nephy.jsonkt.delegation.*
 
 object Avatar {
-    data class Entry(override val json: ImmutableJsonObject): VRChaKtModel {
+    data class Entry(override val json: JsonObject): VRChaKtModel {
         val id by string
         val name by string
         val description by string
@@ -23,7 +23,7 @@ object Avatar {
         val unityPackageUpdated by boolean
         val unityPackageURL by string
 
-        data class UnityPackage(override val json: ImmutableJsonObject): VRChaKtModel {
+        data class UnityPackage(override val json: JsonObject): VRChaKtModel {
             val id by string
             val assetUrl by string
             val unityVersion by string

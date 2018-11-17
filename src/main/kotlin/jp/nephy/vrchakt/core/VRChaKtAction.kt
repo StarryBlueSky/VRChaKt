@@ -17,6 +17,7 @@ import kotlinx.coroutines.*
 import mu.KotlinLogging
 import java.util.concurrent.TimeUnit
 import kotlin.coroutines.CoroutineContext
+import kotlin.reflect.KClass
 
 private val logger = KotlinLogging.logger("VRChaKt.ApiAction")
 
@@ -25,7 +26,7 @@ interface VRChaKtAction {
 }
 
 private interface JsonRequest<M: VRChaKtModel> {
-    val model: Class<M>
+    val model: KClass<M>
 }
 
 private typealias ApiCallback<R> = (response: R) -> Unit
@@ -151,7 +152,7 @@ internal fun String.unescapeHTML(): String {
     return replace("&amp;", "&").replace("&lt;", "<").replace("&gt;", ">")
 }
 
-private fun String.toJsonObjectSafe(): ImmutableJsonObject? {
+private fun String.toJsonObjectSafe(): JsonObject? {
     return try {
         toJsonObject()
     } catch (e: CancellationException) {
@@ -162,7 +163,7 @@ private fun String.toJsonObjectSafe(): ImmutableJsonObject? {
     }
 }
 
-private fun String.toJsonArraySafe(): ImmutableJsonArray? {
+private fun String.toJsonArraySafe(): JsonArray? {
     return try {
         toJsonArray()
     } catch (e: CancellationException) {
@@ -173,7 +174,7 @@ private fun String.toJsonArraySafe(): ImmutableJsonArray? {
     }
 }
 
-private fun <T: VRChaKtModel> ImmutableJsonObject.parseSafe(model: Class<out T>, content: String?): T? {
+private fun <T: VRChaKtModel> JsonObject.parseSafe(model: KClass<T>, content: String?): T? {
     return try {
         parse(model)
     } catch (e: CancellationException) {
@@ -184,7 +185,7 @@ private fun <T: VRChaKtModel> ImmutableJsonObject.parseSafe(model: Class<out T>,
     }
 }
 
-private fun <T: VRChaKtModel> ImmutableJsonArray.parseSafe(model: Class<out T>, content: String?): List<T> {
+private fun <T: VRChaKtModel> JsonArray.parseSafe(model: KClass<T>, content: String?): List<T> {
     return try {
         parseList(model)
     } catch (e: CancellationException) {
@@ -235,7 +236,7 @@ private fun checkError(request: HttpRequest, response: HttpResponse, content: St
     throw VRChaKtLocalizedException(LocalizedString.ApiReturnedNon200StatusCode, request, response, response.status.value, response.status.description)
 }
 
-class VRChaKtJsonObjectAction<M: VRChaKtModel>(override val request: VRChaKtRequest, override val model: Class<M>): VRChaKtAction, JsonRequest<M>, ApiAction<VRChaKtJsonObjectResponse<M>>(request.session.dispatcher) {
+class VRChaKtJsonObjectAction<M: VRChaKtModel>(override val request: VRChaKtRequest, override val model: KClass<M>): VRChaKtAction, JsonRequest<M>, ApiAction<VRChaKtJsonObjectResponse<M>>(request.session.dispatcher) {
     override suspend fun await(): VRChaKtJsonObjectResponse<M> {
         val (request, response) = executeRequest(request.session, request)
         val content = response.readTextSafe()
@@ -253,7 +254,7 @@ class VRChaKtJsonObjectAction<M: VRChaKtModel>(override val request: VRChaKtRequ
     }
 }
 
-class VRChaKtJsonArrayAction<M: VRChaKtModel>(override val request: VRChaKtRequest, override val model: Class<M>): VRChaKtAction, JsonRequest<M>, ApiAction<VRChaKtJsonArrayResponse<M>>(request.session.dispatcher) {
+class VRChaKtJsonArrayAction<M: VRChaKtModel>(override val request: VRChaKtRequest, override val model: KClass<M>): VRChaKtAction, JsonRequest<M>, ApiAction<VRChaKtJsonArrayResponse<M>>(request.session.dispatcher) {
     override suspend fun await(): VRChaKtJsonArrayResponse<M> {
         val (request, response) = executeRequest(request.session, request)
         val content = response.readTextSafe()
@@ -291,16 +292,16 @@ class VRChaKtMultipleJsonObjectActions<M: VRChaKtModel>(val first: VRChaKtJsonOb
         }
     }
 
-    class Results<M: VRChaKtModel>(val first: VRChaKtJsonObjectResponse<M>, val responses: Map<Class<out VRChaKtModel>, List<VRChaKtJsonObjectResponse<*>>>) {
+    class Results<M: VRChaKtModel>(val first: VRChaKtJsonObjectResponse<M>, val responses: Map<KClass<out VRChaKtModel>, List<VRChaKtJsonObjectResponse<*>>>) {
         inline fun <reified T: VRChaKtModel> responses(): List<VRChaKtJsonObjectResponse<T>> {
             @Suppress("UNCHECKED_CAST")
-            return responses[T::class.java].orEmpty().map { it as VRChaKtJsonObjectResponse<T> }
+            return responses[T::class].orEmpty().map { it as VRChaKtJsonObjectResponse<T> }
         }
     }
 
     override suspend fun await(): List<VRChaKtJsonObjectResponse<*>> {
         val first = first.await()
-        val responses = mutableMapOf<Class<out VRChaKtModel>, MutableList<VRChaKtJsonObjectResponse<*>>>()
+        val responses = mutableMapOf<KClass<out VRChaKtModel>, MutableList<VRChaKtJsonObjectResponse<*>>>()
         val responsesList = mutableListOf<VRChaKtJsonObjectResponse<*>>()
         for (request in requests) {
             val results = Results(first, responses)
