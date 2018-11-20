@@ -8,8 +8,8 @@ plugins {
 }
 
 group = "jp.nephy"
-version = "2.0.2"
-val ktorVersion = "1.0.0-beta-3"
+version = "2.0.3"
+val ktorVersion = "1.0.0"
 
 repositories {
     mavenCentral()
