@@ -2,7 +2,7 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.JsonObject
+import jp.nephy.jsonkt.*
 import jp.nephy.jsonkt.delegation.*
 
 object Avatar {
@@ -16,7 +16,7 @@ object Avatar {
         val assetUrl by string
         val imageUrl by string
         val thumbnailImageUrl by string
-        val releaseStatus by enum(ReleaseStatus::class, default = ReleaseStatus.Public)
+        val releaseStatus by enum { ReleaseStatus.Public }
         val version by int
         val featured by boolean
         val unityPackages by modelList<UnityPackage>()

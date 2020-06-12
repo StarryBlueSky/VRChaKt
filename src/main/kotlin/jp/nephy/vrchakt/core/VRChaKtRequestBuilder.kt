@@ -10,13 +10,11 @@ import io.ktor.http.content.OutgoingContent
 import io.ktor.util.appendAll
 import io.ktor.util.flattenEntries
 import io.ktor.util.flattenForEach
-import jp.nephy.jsonkt.JsonObject
-import jp.nephy.jsonkt.asJsonElement
-import jp.nephy.jsonkt.toJsonString
+import jp.nephy.jsonkt.*
 import kotlinx.coroutines.io.ByteWriteChannel
 import kotlinx.coroutines.io.writeFully
 import kotlinx.coroutines.io.writeStringUtf8
-import kotlinx.serialization.json.JsonBuilder
+import kotlinx.serialization.json.JsonObjectBuilder
 import kotlinx.serialization.json.json
 import mu.KotlinLogging
 import java.util.*
@@ -204,7 +202,7 @@ class JsonTextContent(private val json: JsonObject): OutgoingContent.WriteChanne
     }
 
     class Builder {
-        private val updates = mutableListOf<JsonBuilder.() -> Unit>()
+        private val updates = mutableListOf<JsonObjectBuilder.() -> Unit>()
 
         fun add(key: String, value: Any?) {
             updates += {

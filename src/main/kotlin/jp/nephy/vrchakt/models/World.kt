@@ -2,10 +2,8 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.JsonObject
+import jp.nephy.jsonkt.*
 import jp.nephy.jsonkt.delegation.*
-import jp.nephy.jsonkt.parseList
-import jp.nephy.jsonkt.string
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.intOrNull
 
@@ -30,7 +28,7 @@ object World {
         val occupants by int
         val organization by string
         val pluginUrl by string
-        val releaseStatus by enum(ReleaseStatus::class, default = ReleaseStatus.Public)
+        val releaseStatus by enum { ReleaseStatus.Public }
         val tags by stringList
         val thumbnailImageUrl by string
         val totalLikes by int

@@ -4,7 +4,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.HttpClientConfig
 import io.ktor.client.engine.HttpClientEngineConfig
 import io.ktor.client.engine.HttpClientEngineFactory
-import io.ktor.client.features.HttpPlainText
 import io.ktor.client.features.cookies.AcceptAllCookiesStorage
 import io.ktor.client.features.cookies.HttpCookies
 import io.ktor.client.features.cookies.addCookie
@@ -90,10 +89,6 @@ class SessionBuilder {
 
         val httpClient = if (httpClientEngineFactory != null) HttpClient(httpClientEngineFactory!!) else HttpClient()
         httpClient.config {
-            install(HttpPlainText) {
-                defaultCharset = Charsets.UTF_8
-            }
-
             if (cookieConfig.acceptCookie) {
                 install(HttpCookies) {
                     storage = AcceptAllCookiesStorage()

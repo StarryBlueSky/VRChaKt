@@ -2,7 +2,7 @@
 
 package jp.nephy.vrchakt.models
 
-import jp.nephy.jsonkt.JsonObject
+import jp.nephy.jsonkt.*
 import jp.nephy.jsonkt.delegation.*
 
 object User {
@@ -12,7 +12,7 @@ object User {
         val currentAvatarAssetUrl by string
         val currentAvatarImageUrl by string
         val currentAvatarThumbnailImageUrl by string
-        val developerType by enum(DeveloperType::class, default = DeveloperType.None)
+        val developerType by enum { DeveloperType.None }
         val displayName by string
         val emailVerified by boolean
         val friendGroupNames by jsonArray
@@ -27,10 +27,10 @@ object User {
         val obfuscatedEmail by string
         val obfuscatedPendingEmail by string
         val pastDisplayNames by modelList<PastDisplayName>()
-        val status by enum(OnlineStatus::class, default = OnlineStatus.Active)
+        val status by enum { OnlineStatus.Active }
         val statusDescription by string
         val steamDetails by model<SteamDetails>()
-        val tags by enumList(Tag::class, unknown = Tag.Unknown)
+        val tags by enumList { listOf(Tag.Unknown) }
         val unsubscribe by boolean
         val username by string
     }
@@ -38,15 +38,15 @@ object User {
     data class Detail(override val json: JsonObject): VRChaKtModel {
         val currentAvatarImageUrl by string
         val currentAvatarThumbnailImageUrl by string
-        val developerType by enum(DeveloperType::class, default = DeveloperType.None)
+        val developerType by enum { DeveloperType.None }
         val displayName by string
         val id by string
         val instanceId by nullableString
         val lastLogin by string("last_login")
         val location by nullableString
-        val status by enum(OnlineStatus::class, default = OnlineStatus.Active)
+        val status by enum { OnlineStatus.Active }
         val statusDescription by string
-        val tags by enumList(Tag::class, unknown = Tag.Unknown)
+        val tags by enumList { listOf(Tag.Unknown) }
         val username by string
         val worldId by nullableString
     }
@@ -57,8 +57,8 @@ object User {
         val displayName by string
         val currentAvatarImageUrl by string
         val currentAvatarThumbnailImageUrl by string
-        val tags by enumList(Tag::class, unknown = Tag.Unknown)
-        val developerType by enum(DeveloperType::class, default = DeveloperType.None)
+        val tags by enumList { listOf(Tag.Unknown) }
+        val developerType by enum { DeveloperType.None }
     }
 
     enum class OnlineStatus(override val value: String): JsonEnum<String> {
